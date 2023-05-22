@@ -1,5 +1,5 @@
 # samba's case for example
-NAME = ubuntu
+NAME = apache
 DOCKERFILE = dockerfile
 IMAGE= $(NAME)-i
 CONTAINER = $(NAME)-c
