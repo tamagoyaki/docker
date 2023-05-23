@@ -1,10 +1,11 @@
 # samba's case for example
-NAME = ubuntu
+DAEMON = smbreloader
+NAME = samba
 DOCKERFILE = dockerfile
 IMAGE= $(NAME)-i
 CONTAINER = $(NAME)-c
 RESTART = --restart always
-#PORT = -p 22:22/tcp
+PORT = -p 445:445/tcp -p 137:137/udp -p 138:138/udp
 
 help:
 	@echo ''
@@ -20,7 +21,7 @@ help:
 	@echo ''
 
 # build
-$(IMAGE):
+$(IMAGE): $(DAEMON)
 	docker build -f $(DOCKERFILE)  -t $(IMAGE) .
 
 # run
@@ -38,3 +39,7 @@ attach:
 	docker attach $(CONTAINER)
 bash:
 	docker exec -it $(CONTAINER) /bin/bash
+
+# build some utils
+$(DAEMON):
+	@cd init.d; make -s $@
