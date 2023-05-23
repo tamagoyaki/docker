@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# Put me in /etc/init.d/
+#
+. /lib/lsb/init-functions
+
+DEBUG=false
+
+if $DEBUG; then
+    BASE=/tmp/test
+    CMD=smbreloader
+    EXEC=$BASE/$CMD
+    SMBCONF=$BASE/confdir
+    PIDFILE=$BASE/$CMD.pid
+else
+    # need to adjust the path to your system.
+    CMD=smbreloader
+    EXEC=/opt/samba/init.d/$CMD
+    SMBCONF=/opt/samba/confdir
+    PIDFILE=/var/run/$CMD.pid
+fi
+
+case "$1" in
+    start)
+	start-stop-daemon --start --pidfile $PIDFILE --make-pidfile --background --exec $EXEC -- --confdir=$SMBCONF;
+
+	sleep 1;
+	ps -e -o pid | grep `cat $PIDFILE` > /dev/null;
+	if [ $? -eq 0 ]; then
+	    log_action_msg "$CMD started";
+	    exit 0
+	else
+	    log_action_msg "ERROR: couldn't daemonize it";
+	    exit 1
+	fi
+
+	;;
+    stop)
+	start-stop-daemon --stop --pidfile $PIDFILE --remove-pidfile --exec $EXEC
+	;;
+    reload)
+	;;
+    restart)
+	;;
+    status)
+	status_of_proc -p $PIDFILE $EXEC $CMD
+	;;
+    *)
+	log_action_msg "Usage: /etc/init.d/smbmng {start|stop|status}" || true
+	exit 1
+	;;
+esac
+
+exit 0
