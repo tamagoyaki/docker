@@ -1,5 +1,5 @@
 # samba's case for example
-NAME = ubuntu
+NAME = canna
 DOCKERFILE = dockerfile
 IMAGE= $(NAME)-i
 CONTAINER = $(NAME)-c
@@ -16,7 +16,6 @@ help:
 	@echo '    make start  -  start a container'
 	@echo '    make stop   -  stop a container'
 	@echo '    make bash   -  connect to bash on container'
-	@echo '    make attach -  attach to main process on container'
 	@echo ''
 
 # build
@@ -34,7 +33,8 @@ stop:
 	docker stop $(CONTAINER)
 status:
 	docker ps -a
-attach:
+#
+# canna-c's main process is /bin/bash. see wrapper.sh on dockerfile.
+#
+bash attach:
 	docker attach $(CONTAINER)
-bash:
-	docker exec -it $(CONTAINER) /bin/bash

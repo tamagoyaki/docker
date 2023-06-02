@@ -16,12 +16,13 @@ run ln -sf /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
 #    is not installed". So leave it alone it's just a warning. (^^;
 #
 run apt-get update
-run apt-get install -y vim
-run apt-get install -y git
-run apt-get install -y sudo
-run apt-get install -y tzdata
-run apt-get install -y iproute2
-run apt-get install -y openssh-server
+#run apt-get install -y vim
+#run apt-get install -y git
+#run apt-get install -y sudo
+#run apt-get install -y tzdata
+#run apt-get install -y iproute2
+#run apt-get install -y openssh-server
+run apt-get install -y canna
 
 #
 # PREFERENCE
@@ -37,4 +38,39 @@ run apt-get install -y openssh-server
 #  >     1 pts/0    Ss+    0:00 bash
 #  >    28 pts/1    Ss     0:00 /bin/bash
 #  >    42 pts/1    R+     0:00 ps ax
+#
+
+arg WRAPPER=wrapper.sh
+run { \
+    echo "#!/bin/bash"; \
+    echo "rm /tmp/.iroha_unix/IROHA"; \
+    echo "/usr/sbin/cannaserver -inet"; \
+    echo "/bin/bash"; \
+    } > ~/${WRAPPER}
+run chmod u+x ~/${WRAPPER}
+
+
+# WARNING: entrypoint didn't accept variable, I don't know why.
+entrypoint ~/wrapper.sh
+
+#
+# IMPORTANT
+#
+# 1. cannaserver need acceptable ip so that describe it on /etc/hosts.canna
+#    in container.
+#
+# 2. canna client must do "export CANNAHOST=cannaserver's IP"
+#
+# EXAMPLE
+#
+#   On samba-c container
+#
+#     # echo 172.17.0.1 >> /etc/hosts.canna
+#     # cat /etc/hosts.canna
+#     unix
+#     172.17.0.1
+#
+#   On host (canna client)
+#
+#     $ export CANNAHOST=172.17.0.2
 #
