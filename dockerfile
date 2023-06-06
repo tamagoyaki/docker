@@ -31,6 +31,43 @@ run apt-get install -y canna
 # run sed 's/#\(AVOID_DAILY_AUTOCOMMITS=1\)/\1/' -i /etc/etckeeper/etckeeper.conf
 
 #
+# dictionaries
+#
+#   if you use gcannaf.ctd and gtankan.ctd, do below as client.
+#   See Makefile's cannadic target for more info.
+#
+#     $ mkdir -cs 172.17.0.2 gcannaf
+#     $ addwords -cs 172.17.0.2 gcannaf < gcannaf.ctd
+#
+arg CANNADIC=/var/lib/canna/dic/canna
+copy --chmod=644 --chown=canna:canna dictionary/* ${CANNADIC}/
+run { \
+    echo "" ;\
+    echo "# additional dictionaries." ;\
+    echo "gcanna.cbd(gcanna.mwd)  -gcanna---" ; \
+    echo "gcanna.cld(gcanna.mwd)  -gcanna---" ; \
+    echo "gcannaf.ctd(gcannaf.swd)  -gcannaf---" ; \
+    echo "gtankan.ctd(gtankan.swd)  -gtankan---" ; \
+    echo "g_fname.cbd(g_fname.mwd)  -g_fname---" ; \
+    echo "g_fname.cld(g_fname.mwd)  -g_fname---" ; \
+    echo "gskk.cbd(gskk.mwd)  -gskk---" ; \
+    echo "gskk.cld(gskk.mwd)  -gskk---" ; \
+    echo "gt_okuri.cbd(gt_okuri.mwd)  -gt_okuri---" ; \
+    echo "gt_okuri.cld(gt_okuri.mwd)  -gt_okuri---" ; \
+    echo "skkalpha.cbd(skkalpha.mwd)  -skkalpha---" ; \
+    echo "skkalpha.cld(skkalpha.mwd)  -skkalpha---" ; \
+    } >> ${CANNADIC}/dics.dir
+
+#
+# register acceptable client.
+#
+#   See IMPORTANT section below. This setting is somewhat example.
+#
+run { \
+    echo "172.17.0.1"; \
+    } >> /etc/hosts.canna
+
+#
 # In this case, the processes is like these.
 #
 #  > # ps ax
@@ -56,7 +93,7 @@ entrypoint ~/wrapper.sh
 #
 # IMPORTANT
 #
-# 1. cannaserver need acceptable ip so that describe it on /etc/hosts.canna
+# 1. cannaserver needs acceptable ip that is described on /etc/hosts.canna
 #    in container.
 #
 # 2. canna client must do "export CANNAHOST=cannaserver's IP"
