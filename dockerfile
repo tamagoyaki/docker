@@ -105,18 +105,28 @@ entrypoint ~/wrapper.sh
 #
 #   1. cannaserver needs acceptable ip that is described on /etc/hosts.canna
 #      in container.
-#   2. canna client must do "export CANNAHOST=cannaserver's IP"
+#   2. a canna client must do "export CANNAHOST=cannaserver's IP"
+#   3. the canna client would be better to make cannaserver's HINDO file.
 #
 # EXAMPLE
 #
 #   On samba-c container
 #
-#     # echo 172.17.0.1 >> /etc/hosts.canna
-#     # cat /etc/hosts.canna
-#     unix
-#     172.17.0.1
+#     To accept the cannaclient(172.17.0.1).
+#
+#       # echo 172.17.0.1 >> /etc/hosts.canna
+#       # cat /etc/hosts.canna
+#       unix
+#       172.17.0.1
 #
 #   On host (canna client)
 #
-#     $ export CANNAHOST=172.17.0.2
+#     To connect to the cannaserver.
+#
+#       $ export CANNAHOST=172.17.0.2
+#
+#     To create HINDO file.
+#
+#       # apt install canna-utils
+#       $ mkdic -fq `lsdic -i`
 #
