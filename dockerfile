@@ -36,11 +36,21 @@ run apt-get install -y canna
 #   if you use gcannaf.ctd and gtankan.ctd, do below as client.
 #   See Makefile's cannadic target for more info.
 #
-#     $ mkdir -cs 172.17.0.2 gcannaf
+#     $ mkdic -cs 172.17.0.2 gcannaf
 #     $ addwords -cs 172.17.0.2 gcannaf < gcannaf.ctd
 #
 arg CANNADIC=/var/lib/canna/dic/canna
-copy --chmod=644 --chown=canna:canna dictionary/* ${CANNADIC}/
+arg TMP=/root/tmp
+run mkdir -p ${TMP}
+copy binsrc/* ${TMP}/
+run { \
+    cd ${TMP}; \
+    for src in `ls`; do mkbindic $src; done; \
+    chmod 644 *.cld *.cbd; \
+    chown canna:canna *.cld *.cbd; \
+    mv *.cld *.cbd ${CANNADIC}; \
+    }
+copy --chmod=644 --chown=canna:canna txtdic/* ${CANNADIC}/
 run { \
     echo "" ;\
     echo "# additional dictionaries." ;\
@@ -93,10 +103,9 @@ entrypoint ~/wrapper.sh
 #
 # IMPORTANT
 #
-# 1. cannaserver needs acceptable ip that is described on /etc/hosts.canna
-#    in container.
-#
-# 2. canna client must do "export CANNAHOST=cannaserver's IP"
+#   1. cannaserver needs acceptable ip that is described on /etc/hosts.canna
+#      in container.
+#   2. canna client must do "export CANNAHOST=cannaserver's IP"
 #
 # EXAMPLE
 #

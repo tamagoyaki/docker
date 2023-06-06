@@ -17,14 +17,14 @@ help:
 	@echo '    make stop   -  stop a container'
 	@echo '    make bash   -  connect to bash on container'
 	@echo ''
-	@echo '    After container started. optional.'
-	@echo ''
-	@echo '       make cannadic - addwords gcannaf.ctd and gtankan.ctd'
+	@echo '  See IMPORTANT section in dockerfile to setup the cannaserver'
+	@echo '  and the client'
 	@echo ''
 
 # build
-DICDIR = dictionary
-$(IMAGE): $(DICDIR)
+BINSRC = binsrc
+TXTDIC = txtdic
+$(IMAGE): $(BINSRC) $(TXTDIC)
 	DOCKER_BUILDKIT=1 docker build -f $(DOCKERFILE)  -t $(IMAGE) .
 
 # run
@@ -204,14 +204,40 @@ $(CANNADICTIONAYDIR):
 #
 # binary dictionaries for docker container
 #
-#   NOTE
+#  canna can create binary dictionary from text dictionary by the mkbindic
+#  command.
 #
-#     text dictionaries can be added by client using mkdir and addwords.
+#  NOTE
 #
-$(DICDIR): $(SKKALPCTD) $(GFNAMECTD) $(GCANNACTD) $(GTOKURICTD) $(GSKKT)
+#    text dictionaries can be added by client using mkdic and addwords
+#    if client has these command.
+#
+#  WARNING
+#
+#    Ahh, client which want to use cannaserver on docker doesn't have mkbindic,
+#    mkdic and addwords because these commands are bundled with cannaserver
+#    itself. so the method below does not work. Do these commands in docker
+#    container instead.
+#
+#      $(BINSRC): $(SKKALPCTD) $(GFNAMECTD) $(GCANNACTD) $(GTOKURICTD) $(GSKKT)
+#          mkdir $@
+#          cd $@; for src in $^; do mkbindic ../$$src; done
+#
+#    See also dockerfile.
+#
+$(BINSRC): $(SKKALPCTD) $(GFNAMECTD) $(GCANNACTD) $(GTOKURICTD) $(GSKKT)
 	mkdir $@
-	cd $@; for src in $^; do mkbindic ../$$src; done
+	cp $^ $@
 
 #
+# text dictionaries for docker container
+#
+#    The mkdic and the mkaddwords have the same problem as binary dictionaries
+#    above.
+#
+$(TXTDIC): $(GCANNAFCTD) $(GTANKANCTD)
+	mkdir $@
+	cp $^ $@
+#
 clean:
-	$(RM) -r $(SKKALPBZ2) $(SKKALPDIR) $(CANNADICBZ2) $(CANNADICDIR) $(GSKKGZ) $(GSKKDIR) $(CANNADICTIONAYDIR) $(DICDIR)
+	$(RM) -r $(SKKALPBZ2) $(SKKALPDIR) $(CANNADICBZ2) $(CANNADICDIR) $(GSKKGZ) $(GSKKDIR) $(CANNADICTIONAYDIR) $(BINSRC) $(TXTDIC)
